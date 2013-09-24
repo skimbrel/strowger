@@ -19,8 +19,8 @@ class Router(object):
         self.routes = []
         self.default_handler = default_handler
 
-    def add_route(self, pattern, handler):
-        compiled = re.compile(pattern)
+    def add_route(self, pattern, handler, flags=0):
+        compiled = re.compile(pattern, flags=flags)
         self.routes.append(Map(compiled, handler))
 
     def match(self, body):
