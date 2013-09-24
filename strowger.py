@@ -7,26 +7,26 @@ from flask import request
 from twilio import twiml
 
 
-Map = namedtuple('Map', 'pattern handler')
+Rule = namedtuple('Rule', 'pattern handler')
 MediaItem = namedtuple('MediaItem', 'content_type url')
 
 RESPONSE_HEADERS = {'Content-Type': 'application/xml'}
 
 
-class Router(object):
+class Map(object):
 
     def __init__(self, default_handler=None):
-        self.routes = []
+        self.rules = []
         self.default_handler = default_handler
 
-    def add_route(self, pattern, handler, flags=0):
+    def add_rule(self, pattern, handler, flags=0):
         compiled = re.compile(pattern, flags=flags)
-        self.routes.append(Map(compiled, handler))
+        self.rules.append(Rule(compiled, handler))
 
     def match(self, body):
-        for route in self.routes:
-            if route.pattern.match(body):
-                return route.handler
+        for rule in self.rules:
+            if rule.pattern.match(body):
+                return rule.handler
 
         return self.default_handler
 
@@ -53,20 +53,20 @@ class TwilioMessageRequest(object):
             self.media_items = media_items
 
 
-class SmsApp(object):
+class Switch(object):
 
     def __init__(self, name, request_path='/', default_handler=None, **kwargs):
-        '''Create an SmsApp named `name`.
+        '''Create a Switch named `name`.
 
         Additional kwargs are passed to the underlying Flask application.
         '''
         self.app = Flask(name, **kwargs)
-        self.router = Router(default_handler=default_handler)
+        self.mapping = Map(default_handler=default_handler)
 
         @self.app.route(request_path, methods=['GET', 'POST'])
         def twilio():
             body = request.values['Body']
-            handler = self.router.match(body)
+            handler = self.mapping.match(body)
 
             if handler is None:
                 # XXX Is this the right behavior?
