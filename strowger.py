@@ -99,3 +99,6 @@ class Switch(object):
 
     def run(self, debug=False):
         self.app.run(debug=debug)
+
+    def __call__(self, *args, **kwargs):
+        return self.app(*args, **kwargs)
