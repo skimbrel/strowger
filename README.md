@@ -76,6 +76,8 @@ request:
 
 - `from_number`: The number the message was sent from.
 - `to_number`: The number the message was sent to.
+- `message_sid`: The Twilio MessageSid identifying the message.
+- `account_sid`: The Twilio AccountSid identifying the Twilio account.
 - `message_body`: The full body of the message.
 - `media_count`: The number of media items attached to the message.
 - `media_items`: A list of `MediaItem` objects with the `content_type`
