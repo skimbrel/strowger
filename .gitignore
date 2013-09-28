@@ -2,3 +2,6 @@ venv
 *.pyc
 *~
 *.swp
+
+dist
+strowger.egg-info
