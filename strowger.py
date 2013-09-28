@@ -25,10 +25,11 @@ class Map(object):
 
     def match(self, body):
         for rule in self.rules:
-            if rule.pattern.match(body):
-                return rule.handler
+            m = rule.pattern.match(body)
+            if m is not None:
+                return m, rule.handler
 
-        return self.default_handler
+        return None, self.default_handler
 
 
 class TwilioMessageRequest(object):
@@ -66,7 +67,7 @@ class Switch(object):
         @self.app.route(request_path, methods=['GET', 'POST'])
         def twilio():
             body = request.values['Body']
-            handler = self.mapping.match(body)
+            match_obj, handler = self.mapping.match(body)
 
             if handler is None:
                 # XXX Is this the right behavior?
@@ -76,8 +77,13 @@ class Switch(object):
             twiml_response = twiml.Response()
             twilio_request = TwilioMessageRequest(request)
 
+            if match_obj is not None:
+                kwargs = match_obj.groupdict()
+            else:
+                kwargs = {}
+
             try:
-                handler(twilio_request, twiml_response)
+                handler(twilio_request, twiml_response, **kwargs)
                 return unicode(twiml_response), 200, RESPONSE_HEADERS
             except:
                 abort(500)
