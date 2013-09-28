@@ -38,6 +38,8 @@ class TwilioMessageRequest(object):
     def __init__(self, flask_request):
         self.from_number = flask_request.values['From']
         self.to_number = flask_request.values['To']
+        self.message_sid = flask_request.values['MessageSid']
+        self.account_sid = flask_request.values['AccountSid']
         self.message_body = flask_request.values['Body']
         self.media_count = int(flask_request.values['NumMedia'])
         self.media_items = []
@@ -51,7 +53,7 @@ class TwilioMessageRequest(object):
                 ctype = flask_request.values[
                     'MediaContentType{}'.format(index)
                 ]
-                media_urls.append(MediaItem(ctype, url))
+                media_items.append(MediaItem(ctype, url))
 
             self.media_items = media_items
 
@@ -88,11 +90,8 @@ class Switch(object):
             else:
                 kwargs = {}
 
-            try:
-                response = handler(twilio_request, twiml_response, **kwargs)
-                return unicode(response), 200, RESPONSE_HEADERS
-            except:
-                abort(500)
+            response = handler(twilio_request, twiml_response, **kwargs)
+            return unicode(response), 200, RESPONSE_HEADERS
 
     def connect(self, pattern, flags=0):
         def _decorator(f):
