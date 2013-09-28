@@ -1,8 +1,8 @@
 from setuptools import find_packages
 from setuptools import setup
 
-from strowger import __version__
-
+# Load version in here without trying to import the rest of the package.
+exec(open('strowger/_version.py').read())
 
 REQUIRES = ["twilio >= 3.6.1", "flask >= 0.9"]
 
