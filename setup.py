@@ -1,3 +1,4 @@
+from setuptools import find_packages
 from setuptools import setup
 
 from strowger import __version__
@@ -7,6 +8,7 @@ REQUIRES = ["twilio >= 3.6.1", "flask >= 0.9"]
 
 setup(
     name="strowger",
+    packages=find_packages(),
     version=__version__,
     description="Lightweight Twilio SMS application framework",
     author="Sam Kimbrel",
