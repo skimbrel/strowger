@@ -1,5 +1,6 @@
 import re
 from collections import namedtuple
+from functools import wraps
 
 from flask import Flask
 from flask import abort
@@ -87,6 +88,14 @@ class Switch(object):
                 return unicode(twiml_response), 200, RESPONSE_HEADERS
             except:
                 abort(500)
+
+    def connect(self, pattern, flags=0):
+        def _decorator(f):
+            self.mapping.add_rule(pattern, f, flags=flags)
+            @wraps(f)
+            def wrapped(*args, **kwargs):
+                return f(*args, **kwargs)
+        return _decorator
 
     def run(self, debug=False):
         self.app.run(debug=debug)
