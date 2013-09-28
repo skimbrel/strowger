@@ -1,5 +1,10 @@
-Strowger - simple switching for your Twilio SMS app
-===================================================
+Strowger
+========
+
+Simple switching for your Twilio SMS app.
+
+Why
+---
 
 [Twilio's SMS capabilities](http://www.twilio.com/sms) are awesome.
 [Flask](http://flask.pocoo.org/) apps are awesome.
