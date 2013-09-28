@@ -42,6 +42,7 @@ class TwilioMessageRequest(object):
         self.media_count = int(flask_request.values['NumMedia'])
         self.media_items = []
         self.raw_values = flask_request.values
+        self.flask_request = flask_request
 
         if self.media_count > 0:
             media_items = []
@@ -57,7 +58,8 @@ class TwilioMessageRequest(object):
 
 class Switch(object):
 
-    def __init__(self, name, request_path='/', default_handler=None, **kwargs):
+    def __init__(self, name, request_path='/', methods=None,
+                 default_handler=None, **kwargs):
         '''Create a Switch named `name`.
 
         Additional kwargs are passed to the underlying Flask application.
@@ -65,7 +67,10 @@ class Switch(object):
         self.app = Flask(name, **kwargs)
         self.mapping = Map(default_handler=default_handler)
 
-        @self.app.route(request_path, methods=['GET', 'POST'])
+        if methods is None:
+            methods = ['GET', 'POST']
+
+        @self.app.route(request_path, methods=methods)
         def twilio():
             body = request.values['Body']
             match_obj, handler = self.mapping.match(body)
@@ -84,8 +89,8 @@ class Switch(object):
                 kwargs = {}
 
             try:
-                handler(twilio_request, twiml_response, **kwargs)
-                return unicode(twiml_response), 200, RESPONSE_HEADERS
+                response = handler(twilio_request, twiml_response, **kwargs)
+                return unicode(response), 200, RESPONSE_HEADERS
             except:
                 abort(500)
 
@@ -96,6 +101,9 @@ class Switch(object):
             def wrapped(*args, **kwargs):
                 return f(*args, **kwargs)
         return _decorator
+
+    def set_default_handler(self, handler):
+        self.mapping.default_handler = handler
 
     def run(self, debug=False):
         self.app.run(debug=debug)
